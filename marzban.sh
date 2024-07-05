@@ -793,6 +793,38 @@ cat > "/var/lib/marzban/xray_config.json" << EOF
       "settings": {
         "nonIPQuery": "skip"
       }
+    },
+    {
+      "tag": "WARP-socks5",
+      "protocol": "socks",
+      "settings": {
+        "servers": [
+          {
+            "address": "127.0.0.1",
+            "port": 40000
+          }
+        ]
+      }
+    },
+    {
+      "tag": "WARPv4",
+      "protocol": "freedom",
+      "proxySettings": {
+        "tag": "WARP-socks5"
+      },
+      "settings": {
+        "domainStrategy": "UseIPv4"
+      }
+    },
+    {
+      "tag": "WARPv6",
+      "protocol": "freedom",
+      "proxySettings": {
+        "tag": "WARP-socks5"
+      },
+      "settings": {
+        "domainStrategy": "UseIPv6"
+      }
     }
   ]
 }

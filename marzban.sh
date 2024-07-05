@@ -116,11 +116,6 @@ get_domain_ip() {
     dig +short "$domain" | grep '^[.0-9]*$' | head -n 1
 }
 
-# Fungsi untuk mendapatkan IP publik saat ini
-get_current_ip() {
-    curl -s http://ipinfo.io/ip
-}
-
 # Fungsi untuk meminta pengguna memasukkan domain
 input_domain() {
     read -rp "Masukkan Domain: " domain
@@ -129,8 +124,7 @@ input_domain() {
     echo "$domain"
 }
 
-# Dapatkan IP publik saat ini
-current_ip=$(get_current_ip)
+current_ip=$(curl -s https://ipinfo.io/ip)
 if [ -z "$current_ip" ]; then
     echo "Tidak dapat menemukan IP publik saat ini."
     exit 1

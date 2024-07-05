@@ -12,6 +12,7 @@ Credit aplikasi full to [Gozargah Marzban](https://github.com/Gozargah), saya ha
 - [Gozargah](https://github.com/Gozargah/Marzban)
 - [hamid-gh98](https://github.com/hamid-gh98)
 - [x0sina](https://github.com/x0sina/marzban-sub)
+- [Marling](https://github.com/GawrAme/MarLing)
 
 # List Protocol yang support
 
@@ -33,18 +34,23 @@ Credit aplikasi full to [Gozargah Marzban](https://github.com/Gozargah), saya ha
 # Instalasi
 
 ```html
-apt-get update && apt-get upgrade -y && apt dist-upgrade -y && update-grub &&
-reboot
+apt-get update && apt-get upgrade -y reboot
 ```
 
 Pastikan anda sudah login sebagai root sebelum menjalankan perintah dibawah
 
 ```html
-wget https://raw.githubusercontent.com/GawrAme/MarLing/main/mar.sh && chmod +x
-mar.sh && ./mar.sh
+wget https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/marzban.sh
+&& chmod +x mar.sh && ./mar.sh
 ```
 
-Buka panel Marzban dengan mengunjungi https://domainmu:portyangsudahdiset/dashboard <br>
+Buka panel Marzban dengan mengunjungi https://domainmu/dashboard <br>
+
+Setelah instalasi berhasil, Panel login / Admin bisa ditambahkan dengan command
+
+```html
+marzban cli admin create --sudo
+```
 
 Jika ingin mengubah konfigurasi env variable
 
@@ -88,16 +94,4 @@ Lalu ubah variabel {SERVER_IP} dibawah menjadi domain yang sudah di pointing tad
 # CONTOH
 
 ![image](https://github.com/GawrAme/MarLing/assets/97426017/191a485c-07a7-4a28-88d3-b66fa403abc7)
-</br>
-
-Jika ada typo atau saran bisa PM ke saya di :<a href="https://t.me/EkoLing" target=”_blank”><img src="https://img.shields.io/static/v1?style=for-the-badge&logo=Telegram&label=Telegram&message=Click%20Here&color=blue"></a><br>
-Jika anda berminat bisa join ke Telegram channel saya di :<a href="https://t.me/LingVPN" target=”_blank”><img src="https://img.shields.io/static/v1?style=for-the-badge&logo=Telegram&label=Telegram&message=Click%20Here&color=blue"></a><br>
-<br>
-
-Jika menurut pean script ini membantu, boleh kira nya membelikan saya secangkir kopi melalui QRis dibawah, berapapun nominal nya saya terima 🙏 <br>
-
-![image](https://github.com/GawrAme/MarLing/assets/97426017/096f46ba-ed4d-47c8-a887-f3f3acd595d5)
-
-Terima kasih orang baik! 🙏
-
 </br>

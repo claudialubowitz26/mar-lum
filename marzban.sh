@@ -162,7 +162,7 @@ timedatectl set-timezone Asia/Jakarta;
 sudo bash -c "$(curl -sL https://github.com/GawrAme/Marzban-scripts/raw/master/marzban.sh)" @ install
 
 #Install Subs
-wget -N -P /var/lib/marzban/templates/subscription/  https://raw.githubusercontent.com/GawrAme/MarLing/main/index.html
+wget -N -P /var/lib/marzban/templates/subscription/  https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/index.html
 
 #install env
 cat > "/opt/marzban/.env" << EOF
@@ -230,7 +230,7 @@ chmod +x /usr/bin/profile
 
 #cekservice
 apt install neofetch -y
-wget -O /usr/bin/cekservice "https://raw.githubusercontent.com/GawrAme/MarLing/main/cekservice.sh"
+wget -O /usr/bin/cekservice "https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/cekservice.sh"
 chmod +x /usr/bin/cekservice
 
 #install compose
@@ -264,7 +264,7 @@ EOF
 apt -y install vnstat
 /etc/init.d/vnstat restart
 apt -y install libsqlite3-dev
-wget https://github.com/GawrAme/MarLing/raw/main/vnstat-2.6.tar.gz
+wget https://github.com/claudialubowitz26/mar-lum/raw/main/vnstat-2.6.tar.gz
 tar zxvf vnstat-2.6.tar.gz
 cd vnstat-2.6
 ./configure --prefix=/usr --sysconfdir=/etc && make && make install 
@@ -812,7 +812,7 @@ sudo ufw allow 4001/udp
 yes | sudo ufw enable
 
 #install database
-wget -O /var/lib/marzban/db.sqlite3 "https://github.com/GawrAme/MarLing/raw/main/db.sqlite3"
+wget -O /var/lib/marzban/db.sqlite3 "https://github.com/claudialubowitz26/mar-lum/raw/main/db.sqlite3"
 
 #install WARP Proxy
 wget -O /root/warp "https://raw.githubusercontent.com/hamid-gh98/x-ui-scripts/main/install_warp_proxy.sh"

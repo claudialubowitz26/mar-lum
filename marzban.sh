@@ -110,9 +110,51 @@ fi
 mkdir -p /etc/data
 
 #domain
-read -rp "Masukkan Domain: " domain
-echo "$domain" > /etc/data/domain
-domain=$(cat /etc/data/domain)
+# Fungsi untuk mendapatkan IP dari domain
+get_domain_ip() {
+    local domain=$1
+    dig +short "$domain" | grep '^[.0-9]*$' | head -n 1
+}
+
+# Fungsi untuk mendapatkan IP publik saat ini
+get_current_ip() {
+    curl -s http://ipinfo.io/ip
+}
+
+# Fungsi untuk meminta pengguna memasukkan domain
+input_domain() {
+    read -rp "Masukkan Domain: " domain
+    echo "$domain" > /etc/data/domain
+    domain=$(cat /etc/data/domain)
+    echo "$domain"
+}
+
+# Dapatkan IP publik saat ini
+current_ip=$(get_current_ip)
+if [ -z "$current_ip" ]; then
+    echo "Tidak dapat menemukan IP publik saat ini."
+    exit 1
+fi
+
+while true; do
+    # Minta pengguna memasukkan domain
+    domain=$(input_domain)
+
+    # Dapatkan IP dari domain
+    domain_ip=$(get_domain_ip "$domain")
+
+    if [ -z "$domain_ip" ]; then
+        echo "Tidak dapat menemukan IP untuk domain: $domain"
+    elif [ "$domain_ip" != "$current_ip" ]; then
+        echo "IP domain ($domain_ip) tidak sama dengan IP publik saat ini ($current_ip)."
+    else
+        echo "IP domain ($domain_ip) sama dengan IP publik saat ini ($current_ip)."
+        break
+    fi
+
+    echo "Silakan masukkan ulang domain."
+done
+
 
 #Preparation
 clear

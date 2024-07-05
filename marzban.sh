@@ -833,7 +833,7 @@ cat > "/var/lib/marzban/xray_config.json" << EOF
       }
     },
     {
-      "tag": "WARP-socks5",
+      "tag": "warp",
       "protocol": "socks",
       "settings": {
         "servers": [
@@ -842,26 +842,6 @@ cat > "/var/lib/marzban/xray_config.json" << EOF
             "port": 40000
           }
         ]
-      }
-    },
-    {
-      "tag": "WARPv4",
-      "protocol": "freedom",
-      "proxySettings": {
-        "tag": "WARP-socks5"
-      },
-      "settings": {
-        "domainStrategy": "UseIPv4"
-      }
-    },
-    {
-      "tag": "WARPv6",
-      "protocol": "freedom",
-      "proxySettings": {
-        "tag": "WARP-socks5"
-      },
-      "settings": {
-        "domainStrategy": "UseIPv6"
       }
     }
   ]

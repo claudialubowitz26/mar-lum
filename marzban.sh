@@ -104,6 +104,7 @@ if [[ "$COUNTRY_CODE" == "ID" ]]; then
         # Tidak melakukan apa-apa, sehingga repo bawaan VM tetap digunakan
     fi
 else
+    clear
     colorized_echo yellow "IP bukan indonesia."
     # Lanjutkan dengan repo bawaan OS
 fi
@@ -129,7 +130,6 @@ if [ -z "$current_ip" ]; then
     echo "Tidak dapat menemukan IP publik saat ini."
     exit 1
 fi
-clear
 while true; do
     # Minta pengguna memasukkan domain
     domain=$(input_domain)

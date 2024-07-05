@@ -915,7 +915,7 @@ sudo bash /root/warp -y
 #finishing
 apt autoremove -y
 apt clean
-
+clear
 #restart marzban
 cd /opt/marzban
 docker compose down && docker compose up -d

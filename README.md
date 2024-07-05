@@ -34,14 +34,14 @@ Credit aplikasi full to [Gozargah Marzban](https://github.com/Gozargah), saya ha
 # Instalasi
 
 ```html
-apt-get update && apt-get upgrade -y reboot
+apt-get update && apt-get upgrade -y
 ```
 
 Pastikan anda sudah login sebagai root sebelum menjalankan perintah dibawah
 
 ```html
 wget https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/marzban.sh
-&& chmod +x mar.sh && ./mar.sh
+&& chmod +x marzban.sh && ./marzban.sh
 ```
 
 Buka panel Marzban dengan mengunjungi https://domainmu/dashboard <br>

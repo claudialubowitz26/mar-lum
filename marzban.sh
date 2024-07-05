@@ -285,7 +285,7 @@ touch /var/log/nginx/access.log
 touch /var/log/nginx/error.log
 
 cat > "/opt/marzban/nginx.conf" << EOF
-#user nobody nogroup;
+user  www-data;
 worker_processes auto;
 
 error_log /var/log/nginx/error.log;
@@ -529,7 +529,7 @@ apt install socat cron bash-completion -y
 #install cert
 mkdir -p /var/lib/marzban/certs/$domain
 curl https://get.acme.sh | sh -s
-/root/.acme.sh/acme.sh --server letsencrypt --register-account -m helpers@lumine.my.id --issue -d $domain --standalone -k ec-256 --debug
+/root/.acme.sh/acme.sh --server letsencrypt --register-account -m helpers@lumine.my.id --issue -d $domain --standalone -k ec-256
 ~/.acme.sh/acme.sh --installcert -d $domain --fullchainpath /var/lib/marzban/certs/$domain/fullchain.cer --keypath /var/lib/marzban/certs/$domain/privkey.key --ecc
 
 
@@ -827,7 +827,8 @@ cd
 profile
 echo "Lumine VPN"
 echo "-=================================-"
-echo "Untuk Tambahkan Admin Panel ketik : marzban cli admin create --sudo"
+echo "Untuk Tambahkan Admin Panel ketik : "
+echo "marzban cli admin create --sudo"
 echo "URL Panel : https://${domain}/dashboard"
 echo "-=================================-"
 echo "Terimakasih"
@@ -836,10 +837,6 @@ colorized_echo green "Script telah berhasil di install"
 
 
 rm /root/marzban.sh
-
-colorized_echo blue "Menghapus admin bawaan db.sqlite"
-marzban cli admin delete -u admin -y
-
 
 echo -e "[\e[1;31mWARNING\e[0m] Apakah Ingin Reboot [default y](y/n)? "
 read answer

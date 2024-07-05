@@ -1,4 +1,5 @@
 #!/bin/bash
+
 port=$(netstat -tunlp | grep 'python' | awk '{split($4, a, ":"); print a[2]}')
 
 # // Code for service
@@ -19,9 +20,7 @@ export PENDING="[${YELLOW} PENDING ${NC}]";
 export SEND="[${YELLOW} SEND ${NC}]";
 export RECEIVE="[${YELLOW} RECEIVE ${NC}]";
 
-# // VAR
-
-#NGINX
+# NGINX
 if [[ $(netstat -ntlp | grep -i nginx | grep -i 0.0.0.0:443 | awk '{print $4}' | cut -d: -f2 | xargs | sed -e 's/ /, /g') == '443' ]]; then
     NGINX="${GREEN}Okay${NC}";
 else
@@ -34,20 +33,34 @@ if [[ $(systemctl status ufw | grep -w Active | awk '{print $2}' | sed 's/(//g' 
 else
     UFW="${RED}Not Okay${NC}";
 fi
-#MARZBAN
+
+# MARZBAN
 if [[ $(netstat -ntlp | grep -i python | grep -i "0.0.0.0:${port}" | awk '{print $4}' | cut -d: -f2 | xargs | sed -e 's/ /, /g') == "${port}" ]]; then
     MARZ="${GREEN}Okay${NC}";
 else
     MARZ="${RED}Not Okay${NC}";
 fi
 
+# DOCKER
+if [[ $(systemctl is-active docker) == 'active' ]]; then
+    RUNNING_CONTAINERS=$(docker ps -q | wc -l)
+    if [ "$RUNNING_CONTAINERS" -gt 0 ]; then
+        DOCKER="${GREEN}Okay${NC}";
+    else
+        DOCKER="${YELLOW}Running No Container${NC}";
+    fi
+else
+    DOCKER="${RED}Not Okay${NC}";
+fi
+
 echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
 echo -e "\E[44;1;39m            ⇱ Service Information ⇲             \E[0m"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e "❇️ Nginx                :$NGINX"
-echo -e "❇️ Firewall             :$UFW"
-echo -e "❇️ Marzban Panel        :$MARZ"
+echo -e "❇️ Nginx                : $NGINX"
+echo -e "❇️ Firewall             : $UFW"
+echo -e "❇️ Marzban Panel        : $MARZ"
+echo -e "❇️ Docker               : $DOCKER"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
 echo -e "MARZBAN SHARING PORT 443 SAFE"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"

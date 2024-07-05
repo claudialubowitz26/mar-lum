@@ -159,10 +159,10 @@ apt-get install libio-socket-inet6-perl libsocket6-perl libcrypt-ssleay-perl lib
 timedatectl set-timezone Asia/Jakarta;
 
 #Install Marzban
-sudo bash -c "$(curl -sL https://github.com/GawrAme/Marzban-scripts/raw/master/marzban.sh)" @ install
+sudo bash -c "$(curl -sL https://github.com/claudialubowitz26/Marzban-scripts/raw/master/marzban.sh)" @ install
 
 #Install Subs
-wget -N -P /var/lib/marzban/templates/subscription/  https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/index.html
+wget -N -P /var/lib/marzban/templates/subscription/ https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/index.html
 
 #install env
 cat > "/opt/marzban/.env" << EOF
@@ -221,7 +221,7 @@ cat > "/usr/bin/profile" << EOF
 #!/bin/bash
 clear
 neofetch
-echo -e " Selamat datang di layanan AutoInstaller LumineVPN x Marzban"
+echo -e " Selamat datang di layanan AutoScript LumineVPN x Marzban"
 echo -e " Ketik \e[1;32mmarzban\e[0m untuk menampilkan daftar perintah"
 echo -e ""
 cekservice
@@ -307,7 +307,6 @@ http
     '"\$http_user_agent" "\$http_x_forwarded_for"';
 
     access_log /var/log/nginx/access.log main;
-    sendfile on;
 
     sendfile       on;
     tcp_nopush     on;
@@ -501,7 +500,7 @@ http
             proxy_http_version 1.1;
             proxy_set_header Upgrade \$http_upgrade;
             proxy_set_header Connection "upgrade";
-            proxy_pass http://0.0.0.0:8000;
+            proxy_pass http://0.0.0.0:7879;
             proxy_set_header Host \$host;
             proxy_set_header X-Real-IP \$remote_addr;
             proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
@@ -799,6 +798,29 @@ cat > "/var/lib/marzban/xray_config.json" << EOF
 }
 EOF
 
+#update host marzban config
+apt install sqlite3 -y
+
+cd /var/lib/marzban
+
+# Nama database
+DB_NAME="db.sqlite3"
+
+if [ ! -f "$DB_NAME" ]; then
+  echo "Database $DB_NAME tidak ditemukan!"
+  exit 1
+fi
+
+SQL_QUERY="UPDATE hosts SET address = '$domain' WHERE address = 'subdomain.lumine.my.id'; UPDATE hosts SET host = '$domain' WHERE host = 'subdomain.lumine.my.id';"
+
+sqlite3 "$DB_NAME" "$SQL_QUERY"
+
+# Periksa apakah query berhasil dijalankan
+if [ $? -eq 0 ]; then
+  echo "Update berhasil dilakukan."
+else
+  echo "Gagal melakukan update."
+fi
 
 #install firewall
 apt install ufw -y
@@ -823,7 +845,11 @@ sudo bash /root/warp -y
 apt autoremove -y
 apt clean
 
+#restart marzban
+cd /opt/marzban
+docker compose down && docker compose up -d
 cd
+
 profile
 echo "Lumine VPN"
 echo "-=================================-"
@@ -838,10 +864,11 @@ colorized_echo green "Script telah berhasil di install"
 
 rm /root/marzban.sh
 
-echo -e "[\e[1;31mWARNING\e[0m] Apakah Ingin Reboot [default y](y/n)? "
-read answer
-if [ "$answer" == "${answer#[Yy]}" ] ;then
-exit 0
+read -rp $'\e[1;31m[WARNING]\e[0m Apakah Ingin Reboot [Default y] (y/n)? ' answer
+answer=${answer:-y}
+
+if [[ "$answer" == "${answer#[Yy]}" ]]; then
+    exit 0
 else
-cat /dev/null > ~/.bash_history && history -c && reboot
+    cat /dev/null > ~/.bash_history && history -c && sudo reboot
 fi

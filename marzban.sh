@@ -104,6 +104,7 @@ if [[ "$COUNTRY_CODE" == "ID" ]]; then
         # Tidak melakukan apa-apa, sehingga repo bawaan VM tetap digunakan
     fi
 else
+    clear
     colorized_echo yellow "IP bukan indonesia."
     # Lanjutkan dengan repo bawaan OS
 fi

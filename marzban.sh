@@ -138,8 +138,10 @@ while true; do
     domain_ip=$(get_domain_ip "$domain")
 
     if [ -z "$domain_ip" ]; then
+        clear
         colorized_echo red "Tidak dapat menemukan IP untuk domain: $domain"
     elif [ "$domain_ip" != "$current_ip" ]; then
+        clear
         colorized_echo yellow "IP domain ($domain_ip) tidak sama dengan IP publik saat ini ($current_ip)."
     else
         colorized_echo green "IP domain ($domain_ip) sama dengan IP publik saat ini ($current_ip)."

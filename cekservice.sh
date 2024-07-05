@@ -41,6 +41,13 @@ else
     MARZ="${RED}Not Okay${NC}";
 fi
 
+# XRAY
+if [[ $(netstat -ntlp | grep -i xray | grep -i 127.0.0.1:2021 | awk '{print $4}' | cut -d: -f2 | xargs | sed -e 's/ /, /g') == '2021' ]]; then
+    XRAY="${GREEN}Okay${NC}";
+else
+    XRAY="${RED}Not Okay${NC}";
+fi
+
 # DOCKER
 if [[ $(systemctl is-active docker) == 'active' ]]; then
     RUNNING_CONTAINERS=$(docker ps -q | wc -l)
@@ -57,10 +64,11 @@ echo ""
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
 echo -e "\E[44;1;39m            ⇱ Service Information ⇲             \E[0m"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
+echo -e "❇️ Docker Container     : $DOCKER"
+echo -e "❇️ XRAY Core            : $XRAY"
 echo -e "❇️ Nginx                : $NGINX"
 echo -e "❇️ Firewall             : $UFW"
 echo -e "❇️ Marzban Panel        : $MARZ"
-echo -e "❇️ Docker               : $DOCKER"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
 echo -e "MARZBAN SHARING PORT 443 SAFE"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"

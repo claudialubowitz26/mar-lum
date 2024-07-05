@@ -830,6 +830,21 @@ cat > "/var/lib/marzban/xray_config.json" << EOF
 }
 EOF
 
+#install firewall
+apt install ufw -y
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow http
+sudo ufw allow https
+sudo ufw allow 4001/tcp
+sudo ufw allow 4001/udp
+yes | sudo ufw enable
+
+#install database
+wget -O /var/lib/marzban/db.sqlite3 "https://github.com/claudialubowitz26/mar-lum/raw/main/db.sqlite3"
+
+
 #update host marzban config
 apt install sqlite3 -y
 
@@ -854,20 +869,6 @@ else
   echo "Gagal melakukan update."
 fi
 
-#install firewall
-apt install ufw -y
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw allow ssh
-sudo ufw allow http
-sudo ufw allow https
-sudo ufw allow 4001/tcp
-sudo ufw allow 4001/udp
-yes | sudo ufw enable
-
-#install database
-wget -O /var/lib/marzban/db.sqlite3 "https://github.com/claudialubowitz26/mar-lum/raw/main/db.sqlite3"
-
 #install WARP Proxy
 wget -O /root/warp "https://raw.githubusercontent.com/hamid-gh98/x-ui-scripts/main/install_warp_proxy.sh"
 sudo chmod +x /root/warp
@@ -882,6 +883,7 @@ cd /opt/marzban
 docker compose down && docker compose up -d
 cd
 
+sleep 5
 profile
 echo "Lumine VPN"
 echo "-=================================-"

@@ -154,7 +154,6 @@ done
 
 
 #Preparation
-clear
 cd;
 apt-get update;
 
@@ -897,7 +896,7 @@ if [ ! -f "$DB_NAME" ]; then
   exit 1
 fi
 
-SQL_QUERY="UPDATE hosts SET address = '$domain' WHERE address = 'subdomain.lumine.my.id'; UPDATE hosts SET host = '$domain' WHERE host = 'subdomain.lumine.my.id';"
+SQL_QUERY="UPDATE hosts SET address = '$domain' WHERE address = 'subdomain.lumine.my.id'; UPDATE hosts SET host = '$domain' WHERE host = 'subdomain.lumine.my.id'; UPDATE hosts SET sni = '$domain' WHERE sni = 'subdomain.lumine.my.id';"
 
 sqlite3 "$DB_NAME" "$SQL_QUERY"
 
@@ -922,7 +921,7 @@ cd /opt/marzban
 docker compose down && docker compose up -d
 cd
 
-sleep 5
+sleep 3
 profile
 echo "Lumine VPN"
 echo "-=================================-"
@@ -932,7 +931,9 @@ echo "URL Panel : https://${domain}/dashboard"
 echo "-=================================-"
 echo "Terimakasih"
 echo "-=================================-"
+echo ""
 colorized_echo green "Script telah berhasil di install"
+echo ""
 
 
 rm /root/marzban.sh

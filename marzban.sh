@@ -42,7 +42,6 @@ if [ -f /etc/os-release ]; then
     fi
 fi
 apt install sudo curl -y
-clear
 if [ "$supported_os" != true ]; then
     colorized_echo red "Error: Skrip ini hanya support di Debian 11 dan Ubuntu 20.04. Mohon gunakan OS yang di support."
     exit 1
@@ -111,7 +110,6 @@ fi
 mkdir -p /etc/data
 
 #domain
-
 # Fungsi untuk mendapatkan IP dari domain
 get_domain_ip() {
     local domain=$1
@@ -125,14 +123,14 @@ input_domain() {
     domain=$(cat /etc/data/domain)
     echo "$domain"
 }
+
 current_ip=$(curl -s https://ipinfo.io/ip)
 if [ -z "$current_ip" ]; then
     echo "Tidak dapat menemukan IP publik saat ini."
     exit 1
 fi
-
+clear
 while true; do
-    clear
     # Minta pengguna memasukkan domain
     domain=$(input_domain)
 

@@ -892,16 +892,17 @@ sudo bash /root/warp -y
 #Set Timezone GMT+7
 timedatectl set-timezone Asia/Jakarta;
 
-#finishing
-apt autoremove -y
-apt clean
-clear
 #restart marzban
 cd /opt/marzban
 docker compose down && docker compose up -d
 cd
 
-sleep 3
+#finishing
+apt autoremove -y
+apt clean
+clear
+
+
 profile
 echo "Lumine VPN"
 echo "-=================================-"

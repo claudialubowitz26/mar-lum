@@ -1,12 +1,17 @@
 #!/bin/bash
 
-# Color definitions
+# Define Colors
 red='\033[0;31m'
 green='\033[0;32m'
 yellow='\033[0;33m'
 plain='\033[0m'
 
-# Log functions
+# Define log paths
+log_folder="${XUI_LOG_FOLDER:=/var/log}"
+iplimit_log_path="${log_folder}/3xipl.log"
+iplimit_banned_log_path="${log_folder}/3xipl-banned.log"
+
+# Functions for Logging
 function LOGD() {
     echo -e "${yellow}[DEG] $* ${plain}"
 }
@@ -19,7 +24,7 @@ function LOGI() {
     echo -e "${green}[INF] $* ${plain}"
 }
 
-# check root
+# Check root
 [[ $EUID -ne 0 ]] && LOGE "ERROR: You must be root to run this script! \n" && exit 1
 
 # Check OS and set release variable
@@ -34,123 +39,17 @@ else
     exit 1
 fi
 
-echo "The OS release is: $release"
-
-os_version=""
 os_version=$(grep -i version_id /etc/os-release | cut -d \" -f2 | cut -d . -f1)
 
-if [[ "${release}" == "arch" ]]; then
-    echo "Your OS is Arch Linux"
-elif [[ "${release}" == "parch" ]]; then
-    echo "Your OS is Parch linux"
-elif [[ "${release}" == "manjaro" ]]; then
-    echo "Your OS is Manjaro"
-elif [[ "${release}" == "armbian" ]]; then
-    echo "Your OS is Armbian"
-elif [[ "${release}" == "opensuse-tumbleweed" ]]; then
-    echo "Your OS is OpenSUSE Tumbleweed"
-elif [[ "${release}" == "centos" ]]; then
-    if [[ ${os_version} -lt 8 ]]; then
-        echo -e "${red} Please use CentOS 8 or higher ${plain}\n" && exit 1
-    fi
-elif [[ "${release}" == "ubuntu" ]]; then
-    if [[ ${os_version} -lt 20 ]]; then
-        echo -e "${red} Please use Ubuntu 20 or higher version!${plain}\n" && exit 1
-    fi
-elif [[ "${release}" == "fedora" ]]; then
-    if [[ ${os_version} -lt 36 ]]; then
-        echo -e "${red} Please use Fedora 36 or higher version!${plain}\n" && exit 1
-    fi
-elif [[ "${release}" == "debian" ]]; then
-    if [[ ${os_version} -lt 11 ]]; then
-        echo -e "${red} Please use Debian 11 or higher ${plain}\n" && exit 1
-    fi
-elif [[ "${release}" == "almalinux" ]]; then
-    if [[ ${os_version} -lt 9 ]]; then
-        echo -e "${red} Please use AlmaLinux 9 or higher ${plain}\n" && exit 1
-    fi
-elif [[ "${release}" == "rocky" ]]; then
-    if [[ ${os_version} -lt 9 ]]; then
-        echo -e "${red} Please use Rocky Linux 9 or higher ${plain}\n" && exit 1
-    fi
-elif [[ "${release}" == "oracle" ]]; then
-    if [[ ${os_version} -lt 8 ]]; then
-        echo -e "${red} Please use Oracle Linux 8 or higher ${plain}\n" && exit 1
-    fi
-else
-    echo -e "${red}Your operating system is not supported by this script.${plain}\n"
-    echo "Please ensure you are using one of the following supported operating systems:"
-    echo "- Ubuntu 20.04+"
-    echo "- Debian 11+"
-    echo "- CentOS 8+"
-    echo "- Fedora 36+"
-    echo "- Arch Linux"
-    echo "- Parch Linux"
-    echo "- Manjaro"
-    echo "- Armbian"
-    echo "- AlmaLinux 9+"
-    echo "- Rocky Linux 9+"
-    echo "- Oracle Linux 8+"
-    echo "- OpenSUSE Tumbleweed"
-    exit 1
-
-fi
-
-# Variables
-log_folder="${XUI_LOG_FOLDER:=/var/log}"
-iplimit_log_path="${log_folder}/3xipl.log"
-iplimit_banned_log_path="${log_folder}/3xipl-banned.log"
-
-# Confirm function
-confirm() {
-    if [[ $# > 1 ]]; then
-        echo && read -p "$1 [Default $2]: " temp
-        if [[ "${temp}" == "" ]]; then
-            temp=$2
-        fi
-    else
-        read -p "$1 [y/n]: " temp
-    fi
-    if [[ "${temp}" == "y" || "${temp}" == "Y" ]]; then
-        return 0
-    else
-        return 1
-    fi
-}
-
-# Show Ban Log function
-show_banlog() {
-    if test -f "${iplimit_banned_log_path}"; then
-        if [[ -s "${iplimit_banned_log_path}" ]]; then
-            cat ${iplimit_banned_log_path}
-        else
-            echo -e "${red}Log file is empty.${plain}\n"
-        fi
-    else
-        echo -e "${red}Log file not found. Please Install Fail2ban and IP Limit first.${plain}\n"
-    fi
-}
-
-# Remove conflicts function
-iplimit_remove_conflicts() {
-    local jail_files=(
-        /etc/fail2ban/jail.conf
-        /etc/fail2ban/jail.local
-    )
-
-    for file in "${jail_files[@]}"; do
-        if test -f "${file}" && grep -qw '3x-ipl' ${file}; then
-            sed -i "/\[3x-ipl\]/,/^$/d" ${file}
-            echo -e "${yellow}Removing conflicts of [3x-ipl] in jail (${file})!${plain}\n"
-        fi
-    done
-}
-
-# Create IP Limit Jails function
+# Create iplimit jail files
 create_iplimit_jails() {
     local bantime="${1:-15}"
 
     sed -i 's/#allowipv6 = auto/allowipv6 = auto/g' /etc/fail2ban/fail2ban.conf
+
+    if [[ "${release}" == "debian" && ${os_version} -ge 12 ]]; then
+        sed -i '0,/action =/s/backend = auto/backend = systemd/' /etc/fail2ban/jail.conf
+    fi
 
     cat << EOF > /etc/fail2ban/jail.d/3x-ipl.conf
 [3x-ipl]
@@ -198,135 +97,22 @@ EOF
     echo -e "${green}Ip Limit jail files created with a bantime of ${bantime} minutes.${plain}"
 }
 
-# Install IP Limit function
-install_iplimit() {
-    if ! command -v fail2ban-client &>/dev/null; then
-        echo -e "${green}Fail2ban is not installed. Installing now...!${plain}\n"
+# Remove conflicts
+iplimit_remove_conflicts() {
+    local jail_files=(
+        /etc/fail2ban/jail.conf
+        /etc/fail2ban/jail.local
+    )
 
-        # Check the OS and install necessary packages
-        case "${release}" in
-        ubuntu)
-            if [[ "${os_version}" -ge 24 ]]; then
-                apt update && apt install python3-pip -y
-                python3 -m pip install pyasynchat --break-system-packages
-            fi
-            apt update && apt install fail2ban -y
-            ;;
-        debian | armbian)
-            apt update && apt install fail2ban -y
-            ;;
-        centos | almalinux | rocky | oracle)
-            yum update -y && yum install epel-release -y
-            yum -y install fail2ban
-            ;;
-        fedora)
-            dnf -y update && dnf -y install fail2ban
-            ;;
-        arch | manjaro | parch)
-            pacman -Syu --noconfirm fail2ban
-            ;;
-        *)
-            echo -e "${red}Unsupported operating system. Please check the script and install the necessary packages manually.${plain}\n"
-            exit 1
-            ;;
-        esac
-
-        if ! command -v fail2ban-client &>/dev/null; then
-            echo -e "${red}Fail2ban installation failed.${plain}\n"
-            exit 1
+    for file in "${jail_files[@]}"; do
+        if test -f "${file}" && grep -qw '3x-ipl' ${file}; then
+            sed -i "/\[3x-ipl\]/,/^$/d" ${file}
+            echo -e "${yellow}Removing conflicts of [3x-ipl] in jail (${file})!${plain}\n"
         fi
-
-        echo -e "${green}Fail2ban installed successfully!${plain}\n"
-    else
-        echo -e "${yellow}Fail2ban is already installed.${plain}\n"
-    fi
-
-    echo -e "${green}Configuring IP Limit...${plain}\n"
-
-    # make sure there's no conflict for jail files
-    iplimit_remove_conflicts
-
-    # Check if log file exists
-    if ! test -f "${iplimit_banned_log_path}"; then
-        touch ${iplimit_banned_log_path}
-    fi
-
-    # Check if service log file exists so fail2ban won't return error
-    if ! test -f "${iplimit_log_path}"; then
-        touch ${iplimit_log_path}
-    fi
-
-    # Create the iplimit jail files
-    # we didn't pass the bantime here to use the default value
-    create_iplimit_jails
-
-    # Launching fail2ban
-    if ! systemctl is-active --quiet fail2ban; then
-        systemctl start fail2ban
-        systemctl enable fail2ban
-    else
-        systemctl restart fail2ban
-    fi
-    systemctl enable fail2ban
-
-    echo -e "${green}IP Limit installed and configured successfully!${plain}\n"
-    before_show_menu
+    done
 }
 
-remove_iplimit() {
-    echo -e "${green}\t1.${plain} Only remove IP Limit configurations"
-    echo -e "${green}\t2.${plain} Uninstall Fail2ban and IP Limit"
-    echo -e "${green}\t0.${plain} Abort"
-    read -p "Choose an option: " num
-    case "$num" in
-    1)
-        rm -f /etc/fail2ban/filter.d/3x-ipl.conf
-        rm -f /etc/fail2ban/action.d/3x-ipl.conf
-        rm -f /etc/fail2ban/jail.d/3x-ipl.conf
-        systemctl restart fail2ban
-        echo -e "${green}IP Limit removed successfully!${plain}\n"
-        before_show_menu
-        ;;
-    2)
-        rm -rf /etc/fail2ban
-        systemctl stop fail2ban
-        case "${release}" in
-        ubuntu | debian | armbian)
-            apt-get remove -y fail2ban
-            apt-get purge -y fail2ban -y
-            apt-get autoremove -y
-            ;;
-        centos | almalinux | rocky | oracle)
-            yum remove fail2ban -y
-            yum autoremove -y
-            ;;
-        fedora)
-            dnf remove fail2ban -y
-            dnf autoremove -y
-            ;;
-        arch | manjaro | parch)
-            pacman -Rns --noconfirm fail2ban
-            ;;
-        *)
-            echo -e "${red}Unsupported operating system. Please uninstall Fail2ban manually.${plain}\n"
-            exit 1
-            ;;
-        esac
-        echo -e "${green}Fail2ban and IP Limit removed successfully!${plain}\n"
-        before_show_menu
-        ;;
-    0)
-        echo -e "${yellow}Cancelled.${plain}\n"
-        iplimit_main
-        ;;
-    *)
-        echo -e "${red}Invalid option. Please select a valid number.${plain}\n"
-        remove_iplimit
-        ;;
-    esac
-}
-
-# IP Limit main function
+# Main menu for iplimit
 iplimit_main() {
     echo -e "\n${green}\t1.${plain} Install Fail2ban and configure IP Limit"
     echo -e "${green}\t2.${plain} Change Ban Duration"
@@ -335,11 +121,11 @@ iplimit_main() {
     echo -e "${green}\t5.${plain} Fail2ban Status"
     echo -e "${green}\t6.${plain} Restart Fail2ban"
     echo -e "${green}\t7.${plain} Uninstall Fail2ban"
-    echo -e "${green}\t0.${plain} Back to Main Menu"
+    echo -e "${green}\t0.${plain} Exit"
     read -p "Choose an option: " choice
     case "$choice" in
     0)
-        echo "Exiting..."
+        exit 0
         ;;
     1)
         confirm "Proceed with installation of Fail2ban & IP Limit?" "y"
@@ -389,5 +175,137 @@ iplimit_main() {
     esac
 }
 
-# Run the IP Limit main function
+# Install and configure iplimit
+install_iplimit() {
+    if ! command -v fail2ban-client &>/dev/null; then
+        echo -e "${green}Fail2ban is not installed. Installing now...!${plain}\n"
+
+        case "${release}" in
+        ubuntu)
+            if [[ "${os_version}" -ge 24 ]]; then
+                apt update && apt install python3-pip -y
+                python3 -m pip install pyasynchat --break-system-packages
+            fi
+            apt update && apt install fail2ban -y
+            ;;
+        debian | armbian)
+            apt update && apt install fail2ban -y
+            ;;
+        centos | almalinux | rocky | oracle)
+            yum update -y && yum install epel-release -y
+            yum -y install fail2ban
+            ;;
+        fedora)
+            dnf -y update && dnf -y install fail2ban
+            ;;
+        arch | manjaro | parch)
+            pacman -Syu --noconfirm fail2ban
+            ;;
+        *)
+            echo -e "${red}Unsupported operating system. Please check the script and install the necessary packages manually.${plain}\n"
+            exit 1
+            ;;
+        esac
+
+        if ! command -v fail2ban-client &>/dev/null; then
+            echo -e "${red}Fail2ban installation failed.${plain}\n"
+            exit 1
+        fi
+
+        echo -e "${green}Fail2ban installed successfully!${plain}\n"
+    else
+        echo -e "${yellow}Fail2ban is already installed.${plain}\n"
+    fi
+
+    echo -e "${green}Configuring IP Limit...${plain}\n"
+
+    iplimit_remove_conflicts
+
+    if ! test -f "${iplimit_banned_log_path}"; then
+        touch ${iplimit_banned_log_path}
+    fi
+
+    if ! test -f "${iplimit_log_path}"; then
+        touch ${iplimit_log_path}
+    fi
+
+    create_iplimit_jails
+
+    if ! systemctl is-active --quiet fail2ban; then
+        systemctl start fail2ban
+        systemctl enable fail2ban
+    else
+        systemctl restart fail2ban
+    fi
+    systemctl enable fail2ban
+
+    echo -e "${green}IP Limit installed and configured successfully!${plain}\n"
+}
+
+# Remove iplimit configuration or uninstall fail2ban
+remove_iplimit() {
+    echo -e "${green}\t1.${plain} Only remove IP Limit configurations"
+    echo -e "${green}\t2.${plain} Uninstall Fail2ban and IP Limit"
+    echo -e "${green}\t0.${plain} Abort"
+    read -p "Choose an option: " num
+    case "$num" in
+    1)
+        rm -f /etc/fail2ban/filter.d/3x-ipl.conf
+        rm -f /etc/fail2ban/action.d/3x-ipl.conf
+        rm -f /etc/fail2ban/jail.d/3x-ipl.conf
+        systemctl restart fail2ban
+        echo -e "${green}IP Limit removed successfully!${plain}\n"
+        ;;
+    2)
+        rm -rf /etc/fail2ban
+        systemctl stop fail2ban
+        case "${release}" in
+        ubuntu | debian | armbian)
+            apt-get remove -y fail2ban
+            apt-get purge -y fail2ban -y
+            apt-get autoremove -y
+            ;;
+        centos | almalinux | rocky | oracle)
+            yum remove fail2ban -y
+            yum autoremove -y
+            ;;
+        fedora)
+            dnf remove fail2ban -y
+            dnf autoremove -y
+            ;;
+        arch | manjaro | parch)
+            pacman -Rns --noconfirm fail2ban
+            ;;
+        *)
+            echo -e "${red}Unsupported operating system. Please uninstall Fail2ban manually.${plain}\n"
+            exit 1
+            ;;
+        esac
+        echo -e "${green}Fail2ban and IP Limit removed successfully!${plain}\n"
+        ;;
+    0)
+        echo -e "${yellow}Cancelled.${plain}\n"
+        iplimit_main
+        ;;
+    *)
+        echo -e "${red}Invalid option. Please select a valid number.${plain}\n"
+        remove_iplimit
+        ;;
+    esac
+}
+
+# Show ban logs
+show_banlog() {
+    if test -f "${iplimit_banned_log_path}"; then
+        if [[ -s "${iplimit_banned_log_path}" ]]; then
+            cat ${iplimit_banned_log_path}
+        else
+            echo -e "${red}Log file is empty.${plain}\n"
+        fi
+    else
+        echo -e "${red}Log file not found. Please Install Fail2ban and IP Limit first.${plain}\n"
+    fi
+}
+
+# Main Script Execution
 iplimit_main

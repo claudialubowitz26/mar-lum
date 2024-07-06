@@ -571,8 +571,6 @@ curl https://get.acme.sh | sh -s
 cat > "/var/lib/marzban/xray_config.json" << EOF
 {
   "log": {
-    "access": "/var/lib/marzban/access.log",
-    "error": "/var/lib/marzban/error.log",
     "loglevel": "warning"
   },
   "dns": {
@@ -896,6 +894,10 @@ timedatectl set-timezone Asia/Jakarta;
 cd /opt/marzban
 docker compose down && docker compose up -d
 cd
+
+#updategeo
+wget -O /usr/bin/updategeo "https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/updategeo.sh"
+chmod +x /usr/bin/updategeo
 
 #finishing
 apt autoremove -y

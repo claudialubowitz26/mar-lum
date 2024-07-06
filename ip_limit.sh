@@ -24,6 +24,23 @@ function LOGI() {
     echo -e "${green}[INF] $* ${plain}"
 }
 
+# Confirmation function
+confirm() {
+    if [[ $# > 1 ]]; then
+        echo && read -p "$1 [Default $2]: " temp
+        if [[ "${temp}" == "" ]]; then
+            temp=$2
+        fi
+    else
+        read -p "$1 [y/n]: " temp
+    fi
+    if [[ "${temp}" == "y" || "${temp}" == "Y" ]]; then
+        return 0
+    else
+        return 1
+    fi
+}
+
 # Check root
 [[ $EUID -ne 0 ]] && LOGE "ERROR: You must be root to run this script! \n" && exit 1
 

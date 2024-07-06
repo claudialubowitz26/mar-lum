@@ -42,7 +42,7 @@ else
 fi
 
 # XRAY
-if [[ $(netstat -ntlp | grep -i xray | grep -i 127.0.0.1:2021 | awk '{print $4}' | cut -d: -f2 | xargs | sed -e 's/ /, /g') == '2021' ]]; then
+if [[ $(netstat -ntlp | grep -i xray | grep -i 127.0.0.1:2022 | awk '{print $4}' | cut -d: -f2 | xargs | sed -e 's/ /, /g') == '2022' ]]; then
     XRAY="${GREEN}Okay${NC}";
 else
     XRAY="${RED}Not Okay${NC}";
@@ -70,6 +70,6 @@ echo -e "❇️ Nginx                : $NGINX"
 echo -e "❇️ Firewall             : $UFW"
 echo -e "❇️ Marzban Panel        : $MARZ"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo -e "MARZBAN SHARING PORT 443 SAFE"
+echo -e "               MARZBAN SHARING PORT 443 SAFE"
 echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
 echo ""

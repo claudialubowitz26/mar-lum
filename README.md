@@ -83,14 +83,3 @@ Pastikan SSL/TLS Setting pada cloudflare sudah di set menjadi full
 Lalu pada tab **Network** pastikan gRPC dan WebSocket sudah ON
 ![image](https://github.com/GawrAme/MarLing/assets/97426017/65d9b413-fda4-478a-99a5-b33d8e5fec3d)
 
-# Setting Host Marzban
-
-Saat masuk ke panel, setting host di menu kanan atas <br>
-![image](https://github.com/GawrAme/MarLing/assets/97426017/6b96bce7-39c7-4b5c-b01e-8dfdea91cb47) </br>
-
-Lalu ubah variabel {SERVER_IP} dibawah menjadi domain yang sudah di pointing tadi <br>
-
-# CONTOH
-
-![image](https://github.com/GawrAme/MarLing/assets/97426017/191a485c-07a7-4a28-88d3-b66fa403abc7)
-</br>

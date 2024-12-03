@@ -194,7 +194,7 @@ sysctl -p;
 apt-get install libio-socket-inet6-perl libsocket6-perl libcrypt-ssleay-perl libnet-libidn-perl perl libio-socket-ssl-perl libwww-perl libpcre3 libpcre3-dev zlib1g-dev dbus iftop zip unzip wget net-tools curl nano sed screen gnupg gnupg1 bc apt-transport-https build-essential dirmngr dnsutils sudo at htop iptables bsdmainutils cron lsof lnav -y
 
 #Install Marzban
-sudo bash -c "$(curl -sL https://github.com/claudialubowitz26/Marzban-scripts/raw/master/marzban.sh)" @ install
+sudo bash -c "$(curl -sL https://github.com/GawrAme/Marzban-scripts/raw/master/marzban.sh)" @ install
 
 #Install Subs
 wget -N -P /var/lib/marzban/templates/subscription/ https://raw.githubusercontent.com/claudialubowitz26/mar-lum/main/index.html
@@ -272,7 +272,7 @@ chmod +x /usr/bin/cekservice
 cat > "/opt/marzban/docker-compose.yml" << EOF
 services:
   marzban:
-    image: gozargah/marzban:latest
+    image: gozargah/marzban:v0.6.0
     restart: always
     env_file: .env
     network_mode: host

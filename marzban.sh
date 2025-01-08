@@ -552,6 +552,17 @@ http
 }
 EOF
 
+#install firewall
+apt install ufw -y
+sudo ufw default deny incoming
+sudo ufw default allow outgoing
+sudo ufw allow ssh
+sudo ufw allow http
+sudo ufw allow https
+sudo ufw allow 4001/tcp
+sudo ufw allow 4001/udp
+yes | sudo ufw enable
+
 mkdir -p /var/www/html
 echo "<pre>Hello World!</pre>" > /var/www/html/index.html
 
@@ -842,17 +853,6 @@ cat > "/var/lib/marzban/xray_config.json" << EOF
   ]
 }
 EOF
-
-#install firewall
-apt install ufw -y
-sudo ufw default deny incoming
-sudo ufw default allow outgoing
-sudo ufw allow ssh
-sudo ufw allow http
-sudo ufw allow https
-sudo ufw allow 4001/tcp
-sudo ufw allow 4001/udp
-yes | sudo ufw enable
 
 #install database
 wget -O /var/lib/marzban/db.sqlite3 "https://github.com/claudialubowitz26/mar-lum/raw/main/db.sqlite3"

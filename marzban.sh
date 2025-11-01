@@ -35,9 +35,9 @@ if [ -f /etc/os-release ]; then
     os_name=$(grep -E '^ID=' /etc/os-release | cut -d= -f2)
     os_version=$(grep -E '^VERSION_ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
 
-    if [ "$os_name" == "debian" ] && [ "$os_version" == "12" ]; then
+    if [ "$os_name" == "debian" ] && [ "$os_version" == "11" ]; then
         supported_os=true
-    elif [ "$os_name" == "ubuntu" ] && [ "$os_version" == "20.04" ]; then
+    elif [ "$os_name" == "ubuntu" ] && [ "$os_version" == "22.04" ]; then
         supported_os=true
     fi
 fi
@@ -89,7 +89,7 @@ if [[ "$COUNTRY_CODE" == "ID" ]]; then
                 ;;
             Ubuntu)
                 VERSION=$(lsb_release -sr)
-                if [ "$VERSION" == "20.04" ]; then
+                if [ "$VERSION" == "22.04" ]; then
                     addUbuntu2004Repo
                 else
                     colorized_echo red "Versi Ubuntu ini tidak didukung."
